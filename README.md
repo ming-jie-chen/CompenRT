@@ -1,6 +1,6 @@
 # CompenRT
 ## Introduction
-This is PyTorch implementation of the paper“[Real-Time High-Resolution Projector Compensation]”.
+This is PyTorch implementation of the paper“[(2025 ICME)Real-Time High-Resolution Projector Compensation]”.
 
         
 ## Datasets
@@ -10,9 +10,9 @@ The high resolution compensation datasets:
 ## Usage
    1. Clone this repo:
   
-     git clone https://github.com/cyxwang/CompenHR
+     git clone https://github.com/ming-jie-chen/CompenRT
      
-     cd CompenRT/src/python
+     cd CompenRT/256
 
    2. Download dataset and extract to ‘data/’
      
