@@ -1,0 +1,2 @@
+data_name                     model_name                    loss_function       num_train      batch_size     max_iters      uncmp_psnr     uncmp_rmse     uncmp_ssim     uncmp_diff     uncmp_lpips    valid_psnr     valid_rmse     valid_ssim     valid_diff     
+25-05-23-_19-46-50            CompenHD                      l1+l2+ssim+diff     100            1              1              15.3708        0.2951         0.7259         8.1039         0.2466         22.2151        0.1342         0.6926         5.7264         0.4077         0.0000         
