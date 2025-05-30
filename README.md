@@ -14,8 +14,11 @@ The high resolution compensation datasets:
      
    2. This project provides two versions of the input resolution: one 256 and one 512, which represent the model with the input of the photometric compensation subnetwork at 256×256 and 512×512 resolutions, 
       respectively, and you can choose one for training
+      
      cd CompenRT/256 or cd CompenRT/512
+     
      cd src/python  
+     
    4. Download dataset and extract to ‘data/’
      
    5. Start visdom by typing:
