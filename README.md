@@ -7,6 +7,10 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
 The high resolution compensation datasets:
 [CompenHR](https://github.com/cyxwang/CompenHR/tree/main?tab=readme-ov-file#datasets) by [cyxwang]  
 
+[cloud](https://drive.google.com/drive/folders/1ZRQgqKLQYdgaKeW8OsRLaNIbMlgyzZ-_?usp=drive_link),
+[star](https://drive.google.com/drive/folders/17LYyJDYeQR8xsGAIzlXv5LKLFdro6J7r?usp=drive_link),
+[yellow_paint](https://drive.google.com/drive/folders/1vwjYbXn92-7b8qdSpD8QL12Et3DR4vOo?usp=drive_link),
+
 ## Usage
    1. Clone this repo:
   
