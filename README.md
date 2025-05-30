@@ -1,6 +1,6 @@
 # CompenRT
 ## Introduction
-This is PyTorch implementation of the paper“[(2025 ICME)Real-Time High-Resolution Projector Compensation]”.
+This is PyTorch implementation of the paper“Real-Time High-Resolution Projector Compensation”.
 
         
 ## Datasets
