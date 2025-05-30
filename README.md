@@ -25,9 +25,9 @@ New high-resolution dataset:
      
      cd src/python  
      
-   4. Download dataset and extract to ‘data/’
+   3. Download dataset and extract to ‘data/’
      
-   5. Start visdom by typing:
+   4. Start visdom by typing:
       
      visdom
 
