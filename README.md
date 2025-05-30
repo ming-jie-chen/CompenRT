@@ -12,14 +12,17 @@ The high resolution compensation datasets:
   
      git clone https://github.com/ming-jie-chen/CompenRT
      
-     cd CompenRT/256
-
-   2. Download dataset and extract to ‘data/’
+   2. This project provides two versions of the input resolution implementation:
+      ├── 256/        # 256×256 
+      ├── 512/        # 512×512
+     cd CompenRT/256 or cd CompenRT/512
+     cd src/python  
+   4. Download dataset and extract to ‘data/’
      
-   3. Start visdom by typing:
+   5. Start visdom by typing:
       
      visdom
 
-   4. Run train_CompenRT.py to produce results:
+   5. Run train_CompenRT.py to produce results:
       
      python train_CompenRT.py
