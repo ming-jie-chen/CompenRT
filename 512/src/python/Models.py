@@ -307,8 +307,8 @@ if __name__ == '__main__':
     else:
         print('Train with CPU!')
     input1 = torch.randn(1,3, 1024,1024).to(device)
-    compen_hd =CompenRT().to(device)
-    a, b = profile(compen_hd,input1)
+    compen_rt =CompenRT().to(device)
+    a, b = profile(compen_rt,input1)
     print(a)
     print(b)
 
