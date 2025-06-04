@@ -80,13 +80,14 @@ class PUNet(nn.Module):
         self.res3_s_pre = s
         s = self.relu(self.conv3(s))
         self.res4_s_pre = self.skipConv31(s)
+
         self.res1_s_pre = self.res1_s_pre.squeeze()
         self.res2_s_pre = self.res2_s_pre.squeeze()
         self.res3_s_pre = self.res3_s_pre.squeeze()
         self.res4_s_pre = self.res4_s_pre.squeeze()
         self.simplified = True
 
-    # x is the input uncompensated image, s is a 1x2sx2s56x2s56 surface image
+    # x is the input uncompensated image, s is a surface image, the resolution is 512×512
     def forward(self, x, s):
         # surface feature extraction
 
@@ -195,7 +196,7 @@ class GDNet(nn.Module):
         super(GDNet, self).__init__()
         self.grid_shape = grid_shape
         self.out_size = out_size
-        self.with_refine = with_refine  # becomes WarpingNet w/o refine if set to false
+        self.with_refine = with_refine  # becomes GDNet w/o refine if set to false
         self.name = 'GDNet' if not with_refine else 'GDNet_without_refine'
 
         # relu
@@ -220,9 +221,9 @@ class GDNet(nn.Module):
         if self.with_refine:
             self.grid_refine_net = GridRefine()
         else:
-            self.grid_refine_net = None  # WarpingNet w/o refine
+            self.grid_refine_net = None  # GDNet w/o refine
 
-    # initialize WarpingNet's affine matrix to the input affine_vec
+    # initialize GDNet's affine matrix to the input affine_vec
     def set_affine(self, affine_vec):
         self.affine_mat.data = torch.Tensor(affine_vec).view(-1, 2, 3)
 
@@ -231,9 +232,9 @@ class GDNet(nn.Module):
         # generate coarse affine and TPS grids
         coarse_affine_grid = F.affine_grid(self.affine_mat,
                                            torch.Size([1, x.shape[1], x.shape[2], x.shape[3]])).permute(
-            (0, 3, 1, 2))  # grid generator
+            (0, 3, 1, 2))
         coarse_tps_grid = pytorch_tps.tps_grid(self.theta, self.ctrl_pts,
-                                               (1, x.size()[1]) + self.out_size)  # grid generator
+                                               (1, x.size()[1]) + self.out_size)
 
         # use TPS grid to sample affine grid
         tps_grid = F.grid_sample(coarse_affine_grid, coarse_tps_grid)
@@ -288,7 +289,7 @@ class CompenRT(nn.Module):
         x = self.gd_net(x)
         s = self.gd_net(s)
         # x and s is Bx3x512x512 warped image
-        # photometric compensation using CompenNet
+        # photometric compensation using PUNet
         x= self.pu_net(x,s)
         return x
 
