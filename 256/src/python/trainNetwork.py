@@ -434,36 +434,3 @@ def evaluate(net, valid_data):
     return valid_psnr, valid_rmse, valid_ssim, valid_diff, valid_lpips, prj_valid_pred, valid_speed
 
 
-if __name__ == '__main__':
-    import os
-    # set device
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
-    os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
-    device_ids = [0]
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # print(device)
-    if torch.cuda.device_count() >= 1:
-        print('Train with', len(device_ids), 'GPUs!')
-    else:
-        print('Train with CPU!')
-    # 导入必要的包
-    from PIL import Image
-    import cv2
-    from torchvision.transforms import transforms
-
-    # 定义ToTensor的transform
-    transform = transforms.Compose([transforms.ToTensor()])
-
-    # 读入指定路径下的图片
-    image = Image.open('/mnt/data/huang-lab/mingjie/1024/test/img_0200.png')
-    # 这里对图片应用transform，就转换为了张量
-    roughness_simage = transform(image).unsqueeze(0).cuda()
-    lapresult=laplacian_pyramid(roughness_simage)
-    print(lapresult)
-    print(lapresult[1].size())
-    min_value = torch.min(lapresult[0])
-    max_value = torch.max(lapresult[0])
-
-    normalized_tensor1 = (lapresult[0]- min_value) / (max_value - min_value)
-    save_image(normalized_tensor1, 'b.jpg')
-
