@@ -18,7 +18,6 @@ See Models.py for CompenRT structure.
 See trainNetwork.py for detailed training process.
 See utils.py for helper functions.
 
-Citation:
 
 
 
