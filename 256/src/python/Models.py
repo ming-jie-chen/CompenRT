@@ -313,22 +313,12 @@ if __name__ == '__main__':
     os.environ['CUDA_LAUNCH_BLOCKING'] = '1'
     device_ids = [0]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # print(device)
     if torch.cuda.device_count() >= 1:
         print('Train with', len(device_ids), 'GPUs!')
     else:
         print('Train with CPU!')
-    input2 = torch.randn(4, 3, 1024, 1024).cuda()
     input1 = torch.randn(1,3, 1024,1024).to(device)
-    input3 = torch.randn(4, 3, 256,256).to(device)
     compen_hd =CompenRT().to(device)
     a, b = profile(compen_hd,input1)
     print(a)
     print(b)
-    # model=CompenHD().to(device)
-    # a=model(input1,input1)
-    #
-    # model1=PANet().to(device)
-    # c=model1(input3,input3)
-    # print(profile(model1, input3))
-    # print(c.size())
