@@ -47,9 +47,9 @@ class PUNet(nn.Module):
         self.attention2 = AttentionModel(64)
         self.upsample1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         self.upsample2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.up_conv2=nn.Conv2d(32,3,3,1,1)
-        self.up_conv1 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
 
+        self.up_conv1 = nn.Conv2d(64, 64, 3, 1, 1)
+        self.up_conv2 = nn.Conv2d(32, 3, 3, 1, 1)
         # stores biases of surface feature branch (net simplification)
         self.register_buffer('res1_s_pre', None)
         self.register_buffer('res2_s_pre', None)
