@@ -19,7 +19,7 @@ class AttentionModel(nn.Module):
         return output
 
 
-# # CompenNeSt (journal version)
+# # PUNet
 class PUNet(nn.Module):
     def __init__(self):
         super(PUNet, self).__init__()
@@ -45,12 +45,10 @@ class PUNet(nn.Module):
 
         self.attention1 = AttentionModel(128)
         self.attention2 = AttentionModel(64)
-        # self.trans1=nn.ConvTranspose2d(64,64,2,2,0)
-        # self.trans2=nn.ConvTranspose2d(32,3,2,2,0)
         self.upsample1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         self.upsample2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.last_conv3=nn.Conv2d(32,3,3,1,1)
-        self.last_conv1 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),)
+        self.up_conv2=nn.Conv2d(32,3,3,1,1)
+        self.up_conv1 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
 
         # stores biases of surface feature branch (net simplification)
         self.register_buffer('res1_s_pre', None)
@@ -97,7 +95,6 @@ class PUNet(nn.Module):
             res2_s = self.res2_s_pre
             res3_s = self.res3_s_pre
         else:
-
             res1_s = self.relu(self.skipConv11(s))
             res1_s = self.skipConv12(res1_s)
 
@@ -130,19 +127,15 @@ class PUNet(nn.Module):
 
         x = self.relu(self.conv5(x))
 
-        #encoder
         x = self.attention1(x)
         x=self.relu(self.transConv1(x)+res2)
-        # x=self.relu(self.trans1(x)+res1)
         x = self.upsample1(x)
-        x = self.relu(self.last_conv1(x) + res1)
-        #decoder
+        x = self.relu(self.up_conv1(x) + res1)
 
         x=self.attention2(x)
         x=self.relu(self.transConv2(x))
-        # x=self.relu(self.trans2(x))
         x = self.upsample2(x)
-        x = self.last_conv3(x)
+        x = self.up_conv2(x)
 
         x = torch.clamp(x, max=1)
         x = torch.clamp(x, min=0)
@@ -296,11 +289,12 @@ class CompenRT(nn.Module):
         self.gd_net.simplify(s)
         self.pu_net.simplify(self.gd_net(s))
 
-    # s is Bx3x256x256 surface image
+
     def forward(self, x, s):
         # geometric correction using WarpingNet (both x and s)
         x = self.gd_net(x)
         s = self.gd_net(s)
+        # x and s is Bx3x256x256 warped image
         # photometric compensation using CompenNet
         x= self.pu_net(x,s)
         return x

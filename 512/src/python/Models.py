@@ -35,11 +35,9 @@ class PUNet(nn.Module):
         self.transConv1 = nn.ConvTranspose2d(128, 64,3,2,1,1)
         self.transConv2 = nn.ConvTranspose2d(64, 32, 2,2,0)
         # output layer
-        # skip layers (see s3 in forward)
         # s1
-        # self.skipConv11 = nn.Conv2d(3, 32, 3,1,1)
-        self.skipConv12 = nn.Conv2d(3, 32, 3, 1, 1)
-        self.skipConv13 = nn.Conv2d(32, 32,3,1,1)
+        self.skipConv11 = nn.Conv2d(3, 32, 3, 1, 1)
+        self.skipConv12 = nn.Conv2d(32, 32,3,1,1)
         # s2
         self.skipConv21 = nn.Conv2d(32, 64, 1,1,0)
         self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
@@ -47,13 +45,11 @@ class PUNet(nn.Module):
         self.skipConv31=nn.Conv2d(64,64,3,1,1)
 
         self.attention1 = AttentionModel(128)
-        # self.trans1=nn.ConvTranspose2d(64,64,2,2,0)
-        # self.trans2=nn.ConvTranspose2d(32,3,2,2,0)
         self.upsample1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         self.upsample2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-        self.last_conv3=nn.Conv2d(32,3,3,1,1)
-        self.last_conv1 = nn.Sequential(nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),)
 
+        self.up_conv1 = nn.Conv2d(64, 64, 3, 1, 1)
+        self.up_conv2 = nn.Conv2d(32, 3, 3, 1, 1)
         # stores biases of surface feature branch (net simplification)
         self.register_buffer('res1_s_pre', None)
         self.register_buffer('res2_s_pre', None)
@@ -80,8 +76,8 @@ class PUNet(nn.Module):
         self.res2_s_pre = res2_s
 
         s = self.relu(self.conv2(s))
-        s = self.relu(self.conv3(s))
         self.res3_s_pre = s
+        s = self.relu(self.conv3(s))
         self.res4_s_pre = self.skipConv31(s)
         self.res1_s_pre = self.res1_s_pre.squeeze()
         self.res2_s_pre = self.res2_s_pre.squeeze()
@@ -101,8 +97,8 @@ class PUNet(nn.Module):
             res4_s = self.res4_s_pre
         else:
 
-            res1_s = self.relu(self.skipConv12(s))
-            res1_s = self.skipConv13(res1_s)
+            res1_s = self.relu(self.skipConv11(s))
+            res1_s = self.skipConv12(res1_s)
 
             s = self.relu(self.conv1(s))
 
@@ -111,12 +107,12 @@ class PUNet(nn.Module):
             res2_s = self.skipConv22(res2_s)
 
             s = self.relu(self.conv2(s))
-            res4_s=self.skipConv31(s)
+            res3_s=self.skipConv31(s)
             s = self.relu(self.conv3(s))
-            res3_s=self.relu(self.conv4(s))
+            res4_s=self.relu(self.conv4(s))
 
-        res1 = self.relu(self.skipConv12(x))
-        res1 = self.skipConv13(res1)
+        res1 = self.relu(self.skipConv11(x))
+        res1 = self.skipConv12(res1)
         res1 =res1-res1_s
 
         x = self.relu(self.conv1(x))
@@ -128,26 +124,22 @@ class PUNet(nn.Module):
 
         x = self.relu(self.conv2(x))
 
-        res4=self.skipConv31(x)
-        res4=res4-res4_s
+        res3=self.skipConv31(x)
+        res3=res3-res3_s
         x = self.relu(self.conv3(x))
 
         x=self.relu(self.conv4(x))
-        x = x - res3_s
+        x = x - res4_s
         x = self.relu(self.conv5(x))
-        #encoder
-        x = self.attention1(x)
-        x=self.relu(self.transConv1(x)+res4)
-        # x=self.relu(self.trans1(x)+res2)
-        x = self.upsample1(x)
-        x = self.relu(self.last_conv1(x)+res2)
-        #decoder
 
+        x = self.attention1(x)
+        x=self.relu(self.transConv1(x)+res3)
+        x = self.upsample1(x)
+        x = self.relu(self.up_conv1(x)+res2)
 
         x=self.relu(self.transConv2(x)+res1)
-        # x=self.relu(self.trans2(x))
         x = self.upsample2(x)
-        x = self.last_conv3(x)
+        x = self.up_conv2(x)
         x = torch.clamp(x, max=1)
         x = torch.clamp(x, min=0)
         return x
@@ -290,11 +282,11 @@ class CompenRT(nn.Module):
         self.gd_net.simplify(s)
         self.pu_net.simplify(self.gd_net(s))
 
-    # s is Bx3x256x256 surface image
     def forward(self, x, s):
         # geometric correction using WarpingNet (both x and s)
         x = self.gd_net(x)
         s = self.gd_net(s)
+        # x and s is Bx3x512x512 warped image
         # photometric compensation using CompenNet
         x= self.pu_net(x,s)
         return x
@@ -329,4 +321,3 @@ if __name__ == '__main__':
     # model1=PANet().to(device)
     # c=model1(input3,input3)
     # print(profile(model1, input3))
-    # print(c.size())
