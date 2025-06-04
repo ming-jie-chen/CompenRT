@@ -45,20 +45,8 @@ if __name__ == '__main__':
 
     dataset_root = fullfile(os.getcwd(), '/mnt/data/huang-lab/mingjie/1024')
     data_list = [
-        # "25-05-26-_14-36-56"
-        # '24-11-26-_15-08-06',
-        # '24-11-26-_10-04-32',
-        # '24-09-29-_17-11-17',
-        # '24-09-15-_14-46-21',
-        # '24-09-15-_17-05-36',
-        # '24-09-15-_20-21-08',
-        # 'dye',
-        # 'dye2',
-        # 'flow',
-        # 'purpleflower/1',
-
         'bubble/1',
-        # # # # 'bubble/2',
+        # 'bubble/2',
         # 'bubble/3',
         # 'cloud/1',
         # 'cloud/2',
