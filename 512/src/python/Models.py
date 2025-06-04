@@ -42,6 +42,7 @@ class PUNet(nn.Module):
         self.skipConv21 = nn.Conv2d(32, 64, 1,1,0)
         self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
 
+        #s3
         self.skipConv31=nn.Conv2d(64,64,3,1,1)
 
         self.attention1 = AttentionModel(128)
@@ -230,7 +231,7 @@ class GDNet(nn.Module):
         # generate coarse affine and TPS grids
         coarse_affine_grid = F.affine_grid(self.affine_mat,
                                            torch.Size([1, x.shape[1], x.shape[2], x.shape[3]])).permute(
-            (0, 3, 1, 2))  # grid generator φ(θaff)
+            (0, 3, 1, 2))  # grid generator
         coarse_tps_grid = pytorch_tps.tps_grid(self.theta, self.ctrl_pts,
                                                (1, x.size()[1]) + self.out_size)  # grid generator
 
