@@ -291,7 +291,7 @@ class CompenRT(nn.Module):
 
 
     def forward(self, x, s):
-        # geometric correction using WarpingNet (both x and s)
+        # geometric correction using GDNet (both x and s)
         x = self.gd_net(x)
         s = self.gd_net(s)
         # x and s is Bx3x256x256 warped image
