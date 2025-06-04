@@ -26,15 +26,6 @@ dataset_root = fullfile(os.getcwd(), '/mnt/data/huang-lab/mingjie/1024')
 
 data_list = [
     "bubble/1"
-    # "25-05-26-_14-36-56"
-    # "25-05-23-_19-46-50",
-# 'rose',
-    # '24-09-29-_17-11-17',
-    # '24-09-28-_19-11-01',
-# '24-09-28-_15-27-23',
-    # 'a_test'
-    # 'setups/light2',
-    # '24-09-15-_20-21-08',
 ]
 
 
@@ -56,7 +47,7 @@ train_option_default = {'max_iters': 1,
                         'l2_reg': 1e-4,  # l2 regularization
                         'device': device,
                         'pre-trained': False,
-                        'pretrain_csr': '/home/mingjie/code/code/512/checkpoint/bubble_1_CompenRT_l1+l2+ssim_500_4_2000_0.001_0.001_0.5_900_0.0001.pth',
+                        'pretrain_csr': '/home/mingjie/code/code/512/checkpoint/bubble_1_CompenRT_l1+l2+ssim+diff_500_4_2000_0.001_0.001_0.5_900_0.0001.pth',
                         'pretrain_cmp': '',
                         'plot_on': False,  # plot training progress using visdom (disable for faster training)
                         'train_plot_rate': 100,  # training and visdom plot rate (increase for faster training)

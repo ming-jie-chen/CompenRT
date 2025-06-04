@@ -26,14 +26,6 @@ dataset_root = fullfile(os.getcwd(), '/mnt/data/huang-lab/mingjie/1024')
 
 data_list = [
     'bubble/1'
-    # 'bubble/1',
-    # 'rose'
-    # '24-09-29-_17-11-17',
-    # '24-09-28-_19-11-01',
-    # '24-09-28-_15-27-23',
-    # 'setups/light2',
-
-    # '24-09-15-_20-21-08',
 ]
 
 
