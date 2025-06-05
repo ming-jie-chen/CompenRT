@@ -49,3 +49,4 @@ New high-resolution dataset:
   - [SSIM](https://github.com/Po-Hsun-Su/pytorch-ssim) for for PyTorch implementation of SSIM loss.
   - [CompenNeSt-plusplus](https://github.com/BingyaoHuang/CompenNeSt-plusplus) for data loader.
 - We thank the authors of CompenHR for providing the code (count_hook.py, profile1.py) for statistical parameter quantities and FLOPs.
+- Feel free to open an issue if you have any questions/suggestions/concerns 😁.
