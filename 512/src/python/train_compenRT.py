@@ -149,7 +149,7 @@ if __name__ == '__main__':
                     # set seed of rng for repeatability
                     resetRNGseed(0)
                     # create a GDNet
-                    gd_net = Models.GDNet(out_size=(512,512))
+                    gd_net = Models.GDNet(out_size=(512,512)) #The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
                     # initialize GDNet with affine transformation (remember grid_sample is inverse warp, so src is the the desired warp
                     src_pts = np.array([[-1, -1], [1, -1], [1, 1]]).astype(np.float32)
                     dst_pts = np.array(mask_corners[0][0:3]).astype(np.float32)

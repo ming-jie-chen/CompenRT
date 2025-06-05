@@ -19,6 +19,134 @@ class AttentionModel(nn.Module):
         output = x + x * torch.exp(attention_map)
         return output
 
+
+
+
+
+
+# # PUNet at 256×256 resolution input
+# class PUNet(nn.Module):
+#     def __init__(self):
+#         super(PUNet, self).__init__()
+#         self.name = self.__class__.__name__
+#         self.relu = nn.ReLU()
+#         self.simplified = False
+#         # siamese encoder
+#         self.conv1 = nn.Conv2d(3, 32, 3, 2, 1)
+#         self.conv2 = nn.Conv2d(32, 64, 3, 2, 1)
+#         self.conv3 = nn.Conv2d(64, 128, 3, 1, 1)
+#         self.conv4 = nn.Conv2d(128, 256, 3, 1, 1)
+#         self.conv5 = nn.Conv2d(256, 128, 3, 1, 1)
+#         # transposed conv
+#         self.transConv1 = nn.ConvTranspose2d(128, 64,3,2,1,1)
+#         self.transConv2 = nn.ConvTranspose2d(64, 32, 2,2,0)
+#
+#         # s1
+#         self.skipConv11 = nn.Conv2d(3, 32, 3, 1, 1)
+#         self.skipConv12 = nn.Conv2d(32, 64,3,1,1)
+#         # s2
+#         self.skipConv21 = nn.Conv2d(32, 64, 1,1,0)
+#         self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
+#
+#         self.attention1 = AttentionModel(128)
+#         self.attention2 = AttentionModel(64)
+#         self.upsample1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+#         self.upsample2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+#
+#         self.up_conv1 = nn.Conv2d(64, 64, 3, 1, 1)
+#         self.up_conv2 = nn.Conv2d(32, 3, 3, 1, 1)
+#         # stores biases of surface feature branch (net simplification)
+#         self.register_buffer('res1_s_pre', None)
+#         self.register_buffer('res2_s_pre', None)
+#         self.register_buffer('res3_s_pre', None)
+#
+#         # initialization function, first checks the module type,
+#         def _initialize_weights(m):
+#             if type(m) == nn.Conv2d:
+#                 nn.init.kaiming_normal_(m.weight)
+#
+#         self.apply(_initialize_weights)
+#
+#     # simplify trained model by trimming surface branch to biases
+#     def simplify(self, s):
+#         res1_s = self.relu(self.skipConv11(s))
+#         res1_s = self.relu(self.skipConv12(res1_s))
+#         self.res1_s_pre = res1_s
+#
+#         s = self.relu(self.conv1(s))
+#
+#         res2_s = self.skipConv21(s)
+#         res2_s = self.relu(res2_s)
+#         res2_s = self.skipConv22(res2_s)
+#         self.res2_s_pre = res2_s
+#
+#         s = self.relu(self.conv2(s))
+#         s = self.relu(self.conv3(s))
+#         self.res3_s_pre = s
+#
+#         self.res1_s_pre = self.res1_s_pre.squeeze()
+#         self.res2_s_pre = self.res2_s_pre.squeeze()
+#         self.res3_s_pre = self.res3_s_pre.squeeze()
+#
+#         self.simplified = True
+#
+#     # x is the input uncompensated image, s is a surface image, the resolution is 256×256
+#     def forward(self, x, s):
+#         # surface feature extraction
+#
+#         # alternate between surface and image branch
+#         if self.simplified:
+#             res1_s = self.res1_s_pre
+#             res2_s = self.res2_s_pre
+#             res3_s = self.res3_s_pre
+#         else:
+#             res1_s = self.relu(self.skipConv11(s))
+#             res1_s = self.skipConv12(res1_s)
+#
+#             s = self.relu(self.conv1(s))
+#
+#             res2_s = self.skipConv21(s)
+#             res2_s = self.relu(res2_s)
+#             res2_s = self.skipConv22(res2_s)
+#
+#             s = self.relu(self.conv2(s))
+#             res3_s = self.relu(self.conv3(s))
+#
+#
+#         res1 = self.relu(self.skipConv11(x))
+#         res1 = self.skipConv12(res1)
+#
+#         res1 =res1-res1_s
+#
+#         x = self.relu(self.conv1(x))
+#
+#         res2 = self.skipConv21(x)
+#         res2 = self.relu(res2)
+#         res2 = self.skipConv22(res2)
+#         res2 =res2-res2_s
+#         x = self.relu(self.conv2(x))
+#         x = self.relu(self.conv3(x))
+#
+#         x = x - res3_s
+#         x=self.relu(self.conv4(x))
+#
+#         x = self.relu(self.conv5(x))
+#
+#         x = self.attention1(x)
+#         x=self.relu(self.transConv1(x)+res2)
+#         x = self.upsample1(x)
+#         x = self.relu(self.up_conv1(x) + res1)
+#
+#         x=self.attention2(x)
+#         x=self.relu(self.transConv2(x))
+#         x = self.upsample2(x)
+#         x = self.up_conv2(x)
+#
+#         x = torch.clamp(x, max=1)
+#         x = torch.clamp(x, min=0)
+#         return x
+
+# PUNet at 512×512 resolution input
 class PUNet(nn.Module):
     def __init__(self):
         super(PUNet, self).__init__()
@@ -191,6 +319,7 @@ class GridRefine(nn.Module):
         return x+out
 
 
+# The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
 class GDNet(nn.Module):
     def __init__(self, grid_shape=(5,5), out_size=(512,512), with_refine=True):
         super(GDNet, self).__init__()

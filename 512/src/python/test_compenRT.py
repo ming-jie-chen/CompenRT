@@ -73,7 +73,7 @@ log_file.close()
 
 # resize the input images if input_size is not None
 input_size = (1024, 1024) 
-input_lr_size = (512,512)
+input_lr_size = (512,512)## The input_lr_size parameter is used to adjust the size of the output resolution of the geometry correction.
 upscale_factor = 2
 resetRNGseed(0)
 
