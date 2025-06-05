@@ -274,7 +274,7 @@ def computeLoss(prj_pred, prj_train, loss_option):
         yl_batch = rgb2lab_diff(prj_train, 'cuda')
         diff_map = ciede2000_diff(xl_batch, yl_batch, 'cuda')
         color_loss = diff_map.mean()
-        train_loss = train_loss + color_loss*4e-3
+        train_loss = train_loss + color_loss*4e-3 #The 512×512 coefficient is 4e-3,and the 256×256 coefficient is 5e-3
     return train_loss, l2_loss
 
 
