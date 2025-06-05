@@ -43,3 +43,9 @@ New high-resolution dataset:
            publisher  = {IEEE},
            address    = {France, Nantes},
         }
+## Acknowledgments
+This code borrows heavily from
+(https://github.com/cyxwang/CompenHR) for pytorch_tps.py, differential_color_functions.py.
+(https://github.com/Po-Hsun-Su/pytorch-ssim) for for PyTorch implementation of SSIM loss.
+(https://github.com/BingyaoHuang/CompenNeSt-plusplus) for data loader.
+We thank the authors of CompenHR for providing the code (count_hook.py, profile1.py) for statistical parameter quantities and FLOPs.
