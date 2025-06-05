@@ -46,10 +46,10 @@ New high-resolution dataset:
 ## Acknowledgments
 This code borrows heavily from
 
-CompenHR (https://github.com/cyxwang/CompenHR) for pytorch_tps.py, differential_color_functions.py.
+[CompenHR] (https://github.com/cyxwang/CompenHR) for pytorch_tps.py, differential_color_functions.py.
 
-SSIM (https://github.com/Po-Hsun-Su/pytorch-ssim) for for PyTorch implementation of SSIM loss.
+[SSIM] (https://github.com/Po-Hsun-Su/pytorch-ssim) for for PyTorch implementation of SSIM loss.
 
-CompenNeSt-plusplus (https://github.com/BingyaoHuang/CompenNeSt-plusplus) for data loader.
+[CompenNeSt-plusplus] (https://github.com/BingyaoHuang/CompenNeSt-plusplus) for data loader.
 
 We thank the authors of CompenHR for providing the code (count_hook.py, profile1.py) for statistical parameter quantities and FLOPs.
