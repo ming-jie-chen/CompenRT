@@ -35,6 +35,7 @@ New high-resolution dataset:
       
      python train_CompenRT.py
 ## Citation
+
 @inproceedings{chen2025compenrt,
    title      = {Real-Time High-Resolution Projector Compensation},
    booktitle  = {2025 IEEE International Conference on Multimedia & Expo (ICME)},
