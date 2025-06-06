@@ -18,7 +18,7 @@ New high-resolution dataset:
   
      git clone https://github.com/ming-jie-chen/CompenRT
      
-   2. This project provides two versions of the input resolution: one 256 and one 512, which represent the model with the input of the photometric compensation subnetwork at 256×256 and 512×512 resolutions, 
+   2. This project provides two versions of the input resolution: CompenRT (256->1024) and CompenRT (512->1024), which represent the model with the input of the photometric compensation subnetwork at 256×256 and 512×512 resolutions, 
       respectively, and you can train:
       
      cd CompenRT/src/python  
