@@ -22,7 +22,7 @@ else:
 
 
 # %% K=20 setups
-dataset_root = fullfile(os.getcwd(), '/mnt/data/huang-lab/mingjie/1024')
+dataset_root = fullfile(os.getcwd(), '../../data')
 
 data_list = [
     "bubble/1"
@@ -35,7 +35,9 @@ loss_list = ['l1+l2+ssim+diff']
 
 # You can also compare different configurations, such as different number of training images and loss functions as shown below
 
-model_list = ['CompenRT' ] #
+
+model_list = ['CompenRT (256->1024)' ]
+# model_list = ['CompenRT (512->1024)' ]
 
 # default training options
 train_option_default = {'max_iters': 1,
@@ -73,7 +75,7 @@ log_file.close()
 
 # resize the input images if input_size is not None
 input_size = (1024, 1024) 
-input_lr_size = (512,512)## The input_lr_size parameter is used to adjust the size of the output resolution of the geometry correction.
+input_lr_size = (256,256)## The input_lr_size parameter is used to adjust the size of the output resolution of the geometry correction.
 upscale_factor = 2
 resetRNGseed(0)
 
@@ -114,14 +116,26 @@ for data_name in data_list:
 
                 if torch.cuda.device_count() >= 1: gd_net = nn.DataParallel(gd_net, device_ids=device_ids).to(device)
 
-
-                if model_name == 'CompenRT':
-                    pu_net = Models.PUNet()
-                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
+                if model_name == 'CompenRT (256->1024)':
+                    pu_net = Models.PUNet1()
+                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
+                        device)
                     compen_rt = Models.CompenRT(gd_net, pu_net).cuda()
 
-                    if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(device)
-                    if train_option['pretrain_csr'] !='':
+                    if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
+                        device)
+                    if train_option['pretrain_csr'] != '':
+                        print(compen_rt)
+                        compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
+                if model_name == 'CompenRT (512->1024)':
+                    pu_net = Models.PUNet2()
+                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
+                        device)
+                    compen_rt = Models.CompenRT(gd_net, pu_net).cuda()
+
+                    if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
+                        device)
+                    if train_option['pretrain_csr'] != '':
                         print(compen_rt)
                         compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
             

@@ -42,28 +42,28 @@ if __name__ == '__main__':
         print('Train with CPU!')
 
 
-    dataset_root = fullfile(os.getcwd(), '/mnt/data/huang-lab/mingjie/1024')
+    dataset_root = fullfile(os.getcwd(), '../../data')
     data_list = [
         'bubble/1',
-        # 'bubble/2',
-        # 'bubble/3',
-        # 'cloud/1',
-        # 'cloud/2',
-        # 'cloud/3',
-        # 'cube/1',
-        # 'cube/2',
-        # 'cube/3',
-        # 'curve/1',
-        # 'curve/2',
-        # 'curve/3',
-        # 'lavender/1',
-        # 'lavender/2',
-        # 'lavender/3',
-        # 'stripes/1',
-        # 'stripes/2',
-        # 'stripes/3',
-        # 'water/1',
-        # 'water/2',
+        'bubble/2',
+        'bubble/3',
+        'cloud/1',
+        'cloud/2',
+        'cloud/3',
+        'cube/1',
+        'cube/2',
+        'cube/3',
+        'curve/1',
+        'curve/2',
+        'curve/3',
+        'lavender/1',
+        'lavender/2',
+        'lavender/3',
+        'stripes/1',
+        'stripes/2',
+        'stripes/3',
+        'water/1',
+        'water/2',
         # 'stripes_np/1',
         # 'rock_np/1',
         # 'lemon_np/1',
@@ -72,7 +72,8 @@ if __name__ == '__main__':
     ]
     loss_list = ['l1+l2+ssim+diff']
     num_train_list = [500]
-    model_list = ['CompenRT']
+    model_list = ['CompenRT (256->1024)']
+    #model_list = ['CompenRT (512->1024)']
 
     # default training options
     train_option_default = {'max_iters': 2000,
@@ -109,9 +110,9 @@ if __name__ == '__main__':
     # resize the input images if input_size is not None
 
     input_size = (1024,1024) # we can also use a low-res input to reduce memory usage and speed up training/testing with a sacrifice of precision
-
+    input_lr_size= (256,256)
     resetRNGseed(0)
-    # create a CompenNeSt
+
 
     # stats for different setups
     for data_name in data_list:
@@ -149,7 +150,7 @@ if __name__ == '__main__':
                     # set seed of rng for repeatability
                     resetRNGseed(0)
                     # create a GDNet
-                    gd_net = Models.GDNet(out_size=(512,512)) #The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
+                    gd_net = Models.GDNet(out_size=input_lr_size) #The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
                     # initialize GDNet with affine transformation (remember grid_sample is inverse warp, so src is the the desired warp
                     src_pts = np.array([[-1, -1], [1, -1], [1, 1]]).astype(np.float32)
                     dst_pts = np.array(mask_corners[0][0:3]).astype(np.float32)
@@ -157,8 +158,22 @@ if __name__ == '__main__':
                     gd_net.set_affine(affine_mat.flatten())
                     if torch.cuda.device_count() >= 1: gd_net = nn.DataParallel(gd_net, device_ids=device_ids).to(device)
 
-                    if model_name == 'CompenRT':
-                        pu_net = Models.PUNet()
+                    #  CompenRT (256->1024)
+                    if model_name == 'CompenRT (256->1024)':
+                        pu_net = Models.PUNet1()
+                        if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
+
+
+                        compen_rt = Models.CompenRTFast(gd_net, pu_net)
+                        if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt,device_ids=device_ids).to(device)
+
+
+                        if train_option['pretrain_csr'] !='':
+                            print(train_option['pretrain_csr'])
+                            compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
+                    #  CompenRT (512->1024)
+                    if model_name == 'CompenRT (512->1024)':
+                        pu_net = Models.PUNet2()
                         if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
 
 
@@ -169,7 +184,6 @@ if __name__ == '__main__':
                         if train_option['pretrain_csr'] !='':
                             print(train_option['pretrain_csr'])
                             compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
-
 
 
                     # train option for current configuration, i.e., data name and loss function
