@@ -22,10 +22,10 @@ else:
 
 
 # %% K=20 setups
-dataset_root = fullfile(os.getcwd(), '../../data')
+dataset_root = fullfile(os.getcwd(), '../../data/1024')
 
 data_list = [
-    "bubble/1"
+    'bubble/1',
 ]
 
 
@@ -120,7 +120,7 @@ for data_name in data_list:
                     pu_net = Models.PUNet1()
                     if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
                         device)
-                    compen_rt = Models.CompenRT(gd_net, pu_net).cuda()
+                    compen_rt = Models.CompenRTFast(gd_net, pu_net).cuda()
 
                     if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
                         device)

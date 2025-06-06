@@ -42,7 +42,7 @@ if __name__ == '__main__':
         print('Train with CPU!')
 
 
-    dataset_root = fullfile(os.getcwd(), '../../data')
+    dataset_root = fullfile(os.getcwd(), '../../data/1024')
     data_list = [
         'bubble/1',
         'bubble/2',
