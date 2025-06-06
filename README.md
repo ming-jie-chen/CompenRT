@@ -39,7 +39,7 @@ New high-resolution dataset:
         booktitle  = {2025 IEEE International Conference on Multimedia & Expo (ICME)},
         author     = {Chen, Mingjie and Huang, Bingyao},
         year       = {2025},
-        month      = {June}
+        month      = {June},
         publisher  = {IEEE},
         address    = {France, Nantes},
 }
