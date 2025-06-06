@@ -37,7 +37,7 @@ New high-resolution dataset:
 @inproceedings{chen2025compenrt,
         title      = {Real-Time High-Resolution Projector Compensation},
         booktitle  = {2025 IEEE International Conference on Multimedia & Expo (ICME)},
-        author     = {Chen, Mingjie and Huang, bingyao},
+        author     = {Chen, Mingjie and Huang, Bingyao},
         year       = {2025},
         month      = {June}
         publisher  = {IEEE},
