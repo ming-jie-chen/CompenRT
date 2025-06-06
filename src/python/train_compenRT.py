@@ -100,7 +100,7 @@ if __name__ == '__main__':
     if not os.path.exists(log_dir): os.makedirs(log_dir)
     log_file_name = strftime('%Y-%m-%d_%H_%M_%S', localtime()) + '.txt'
     log_file = open(fullfile(log_dir, log_file_name), 'w')
-    title_str = '{:30s}{:<30}{:<20}{:<15}{:<15}{:<15}{:<30}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}\n'
+    title_str = '{:30s}{:<30}{:<20}{:<15}{:<15}{:<15}{:<30}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}{:<15}\n'
     log_file.write(title_str.format('data_name', 'model_name', 'loss_function',
                                     'num_train', 'batch_size', 'max_iters','time_lapse',
                                     'uncmp_psnr', 'uncmp_rmse', 'uncmp_ssim','uncmp_diff',
