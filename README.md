@@ -33,9 +33,9 @@ New high-resolution dataset:
    `os.environ['CUDA_VISIBLE_DEVICES'] = '0'`
 
    6. Run [`train_compenRT.py`](src/python/train_compenRT.py) to reproduce benchmark results. To visualize the training process in **visdom** (slower), you need to set `plot_on=True`.
-   ```
+   
      python train_compenRT.py
-   ```
+   
 ## Citation
 ```
 @inproceedings{chen2025compenrt,
