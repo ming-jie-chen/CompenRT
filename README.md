@@ -50,7 +50,7 @@ New high-resolution dataset:
 ```
 ## Acknowledgments
 - This code borrows heavily from
-  - The PyTorch implementation of CompenNeStPlusplusDataset.py, ImgProc.py, trainNetwork.py, utils.py is modified from [CompenNeSt-plusplus](https://github.com/BingyaoHuang/CompenNeSt-plusplus/tree/master))
+  - The PyTorch implementation of CompenNeStPlusplusDataset.py, ImgProc.py, trainNetwork.py, utils.py is modified from [CompenNeSt-plusplus](https://github.com/BingyaoHuang/CompenNeSt-plusplus/tree/master)
   - The PyTorch implementation of train_compenRT.py, test_compenRT, Models.py is modified from [CompenHR](https://github.com/cyxwang/CompenHR/tree/main)
   - The PyTorch implementation of TPS warping is modified from [cheind/py-thin-plate-spline](https://github.com/cheind/py-thin-plate-spline).
   - [differential color](https://github.com/ZhengyuZhao/PerC-Adversarial/blob/master/differential_color_functions.py) for differential_color_functions.py.
