@@ -9,11 +9,6 @@ from os.path import join as fullfile
 import torchvision
 import numpy as np
 
-def gamma_trans(img, gamma):  # gamma函数处理
-    gamma_table = [np.power(x / 255.0, gamma) * 255.0 for x in range(256)]  # 建立映射表
-    gamma_table = np.round(np.array(gamma_table)).astype(np.uint8)  # 颜色值为整数
-    return cv.LUT(img, gamma_table)  # 图片颜色查表。另外可以根据光强（颜色）均匀化原则设计自适应算法。
-
 # Use Pytorch multi-threaded dataloader and opencv to load image faster
 class SimpleDataset(Dataset):
     """Simple dataset."""
