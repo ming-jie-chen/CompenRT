@@ -117,27 +117,23 @@ for data_name in data_list:
                 if torch.cuda.device_count() >= 1: gd_net = nn.DataParallel(gd_net, device_ids=device_ids).to(device)
 
                 if model_name == 'CompenRT (256->1024)':
-                    pu_net = Models.PUNet1()
+                    pu_net = Models.PUNet256()
                     if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
                         device)
                     compen_rt = Models.CompenRTFast(gd_net, pu_net).cuda()
 
-                    if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
-                        device)
-                    if train_option['pretrain_csr'] != '':
-                        print(compen_rt)
-                        compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
+
                 if model_name == 'CompenRT (512->1024)':
-                    pu_net = Models.PUNet2()
+                    pu_net = Models.PUNet512()
                     if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
                         device)
                     compen_rt = Models.CompenRT(gd_net, pu_net).cuda()
 
-                    if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
+                if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
                         device)
-                    if train_option['pretrain_csr'] != '':
-                        print(compen_rt)
-                        compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
+                if train_option['pretrain_csr'] != '':
+                    print(compen_rt)
+                    compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
             
 
                 

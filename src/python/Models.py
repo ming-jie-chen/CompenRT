@@ -24,9 +24,9 @@ class AttentionModel(nn.Module):
 
 
 #  PUNet at 256×256 resolution input
-class PUNet1(nn.Module):
+class PUNet256(nn.Module):
     def __init__(self):
-        super(PUNet1, self).__init__()
+        super(PUNet256, self).__init__()
         self.name = self.__class__.__name__
         self.relu = nn.ReLU()
         self.simplified = False
@@ -146,9 +146,9 @@ class PUNet1(nn.Module):
         return x
 
 # PUNet at 512×512 resolution input
-class PUNet2(nn.Module):
+class PUNet512(nn.Module):
     def __init__(self):
-        super(PUNet2, self).__init__()
+        super(PUNet512, self).__init__()
         self.name = self.__class__.__name__
         self.relu = nn.ReLU()
         self.simplified = False
@@ -407,7 +407,7 @@ class CompenRTFast(nn.Module):
 
         # initialize from existing models or create new models
         self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else GDNet()
-        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else PUNet1()
+        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else PUNet256()
     # simplify trained model to a single sampling grid for faster testing
     def simplify(self, s):
         self.gd_net.simplify(s)
@@ -430,7 +430,7 @@ class CompenRT(nn.Module):
 
         # initialize from existing models or create new models
         self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else GDNet()
-        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else PUNet2()
+        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else PUNet512()
     # simplify trained model to a single sampling grid for faster testing
     def simplify(self, s):
         self.gd_net.simplify(s)

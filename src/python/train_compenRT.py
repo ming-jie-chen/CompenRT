@@ -154,14 +154,14 @@ if __name__ == '__main__':
 
                     #  CompenRT (256->1024)
                     if model_name == 'CompenRT (256->1024)':
-                        pu_net = Models.PUNet1()
+                        pu_net = Models.PUNet256()
                         if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
 
 
                         compen_rt = Models.CompenRTFast(gd_net, pu_net)
                     #  CompenRT (512->1024)
                     if model_name == 'CompenRT (512->1024)':
-                        pu_net = Models.PUNet2()
+                        pu_net = Models.PUNet512()
                         if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
 
 
