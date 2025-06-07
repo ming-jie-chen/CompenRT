@@ -75,7 +75,7 @@ log_file.close()
 
 # resize the input images if input_size is not None
 input_size = (1024, 1024) 
-input_lr_size = (256,256)## The input_lr_size parameter is used to adjust the size of the output resolution of the geometry correction.
+# input_lr_size = (256,256)## The input_lr_size parameter is used to adjust the size of the output resolution of the geometry correction.
 upscale_factor = 2
 resetRNGseed(0)
 
@@ -103,7 +103,9 @@ for data_name in data_list:
         for model_name in model_list:
 
             train_option['model_name'] = model_name.replace('/', '_')
-            
+            # Parse the input resolution from model_name
+            input_res = int(model_name.split('(')[1].split('-')[0])  # Extract "256" or "512"
+            input_lr_size = (input_res, input_res)
             # stats for different loss functions
             for loss in loss_list:
                 log_file = open(fullfile(log_dir, log_file_name), 'a')
