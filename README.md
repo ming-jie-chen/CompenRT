@@ -46,7 +46,7 @@ New high-resolution dataset:
 ```
 ## Acknowledgments
 - This code borrows heavily from
-  - [CompenHR](https://github.com/cyxwang/CompenHR) for pytorch_tps.py.
+  - The PyTorch implementation of TPS warping is modified from [cheind/py-thin-plate-spline](https://github.com/cheind/py-thin-plate-spline).
   - [differential color](https://github.com/ZhengyuZhao/PerC-Adversarial/blob/master/differential_color_functions.py) for differential_color_functions.py.
   - [SSIM](https://github.com/Po-Hsun-Su/pytorch-ssim) for for PyTorch implementation of SSIM loss.
   - [CompenNeSt-plusplus](https://github.com/BingyaoHuang/CompenNeSt-plusplus) for data loader.
