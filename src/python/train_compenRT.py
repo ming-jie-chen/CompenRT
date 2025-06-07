@@ -64,11 +64,6 @@ if __name__ == '__main__':
         'stripes/3',
         'water/1',
         'water/2',
-        # 'stripes_np/1',
-        # 'rock_np/1',
-        # 'lemon_np/1',
-        # 'leaf_np/1',
-        # 'flower_np/1',
     ]
     loss_list = ['l1+l2+ssim+diff']
     num_train_list = [500]
@@ -165,12 +160,6 @@ if __name__ == '__main__':
 
 
                         compen_rt = Models.CompenRTFast(gd_net, pu_net)
-                        if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt,device_ids=device_ids).to(device)
-
-
-                        if train_option['pretrain_csr'] !='':
-                            print(train_option['pretrain_csr'])
-                            compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
                     #  CompenRT (512->1024)
                     if model_name == 'CompenRT (512->1024)':
                         pu_net = Models.PUNet2()
@@ -178,12 +167,11 @@ if __name__ == '__main__':
 
 
                         compen_rt = Models.CompenRT(gd_net, pu_net)
-                        if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt,device_ids=device_ids).to(device)
+                    if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt,device_ids=device_ids).to(device)
 
-
-                        if train_option['pretrain_csr'] !='':
-                            print(train_option['pretrain_csr'])
-                            compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
+                    if train_option['pretrain_csr'] !='':
+                        print(train_option['pretrain_csr'])
+                        compen_rt.load_state_dict(torch.load(train_option['pretrain_csr']))
 
 
                     # train option for current configuration, i.e., data name and loss function
