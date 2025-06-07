@@ -34,5 +34,4 @@ class SimpleDataset(Dataset):
         if self.size is not None:
             im = cv.resize(im, self.size[::-1])
         im = cv.cvtColor(im, cv.COLOR_BGR2RGB)
-        # im = gamma_trans(im, 2.2)  # gamma变换
         return im
