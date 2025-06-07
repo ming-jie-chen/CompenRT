@@ -198,14 +198,5 @@ def optionToString(train_option):
                                                   train_option['num_train'], train_option['batch_size'], train_option['max_iters'],
                                                   train_option['lr_cmp'], train_option['lr_warp'],train_option['lr_drop_ratio'], train_option['lr_drop_rate'],
                                                   train_option['l2_reg'])
-def load_state_dict(path):
 
-    state_dict = torch.load(path)
-    new_state_dcit = OrderedDict()
-    for k, v in state_dict.items():
-        if 'module' in k:
-            name = k[7:]
-        else:
-            name = k
-        new_state_dcit[name] = v
-    return new_state_dcit
+

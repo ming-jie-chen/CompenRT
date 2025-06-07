@@ -46,7 +46,6 @@ if __name__ == '__main__':
     data_list = [
         'bubble/1',
         'bubble/2',
-        'bubble/3',
         'cloud/1',
         'cloud/2',
         'cloud/3',
