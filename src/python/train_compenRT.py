@@ -143,9 +143,9 @@ if __name__ == '__main__':
                 # stats for different loss functions
                 for loss in loss_list:
                     log_file = open(fullfile(log_dir, log_file_name), 'a')
-
                     # set seed of rng for repeatability
                     resetRNGseed(0)
+
                     # create a GDNet
                     gd_net = Models.GDNet(out_size=input_lr_size) #The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
                     # initialize GDNet with affine transformation (remember grid_sample is inverse warp, so src is the the desired warp
@@ -160,15 +160,28 @@ if __name__ == '__main__':
                         pu_net = Models.PUNet256()
                         if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
 
-
                         compen_rt = Models.CompenRTFast(gd_net, pu_net)
                     #  CompenRT (512->1024)
                     if model_name == 'CompenRT (512->1024)':
                         pu_net = Models.PUNet512()
                         if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
 
-
                         compen_rt = Models.CompenRT(gd_net, pu_net)
+                    #  Cmptrans (256->1024)
+                    if model_name == 'CmpTrans (256->1024)':
+                        pu_net = Models.CompenTransNet256()
+                        if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
+                        compen_rt = Models.CmpTrans256(gd_net, pu_net)
+                    #  Cmptrans (512->1024)
+                    if model_name == 'CmpTrans (512->1024)':
+                        pu_net = Models.CompenTransNet512()
+                        if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
+                        compen_rt = Models.CmpTrans512(gd_net, pu_net)
+                    #  CompenRT (512->1024) w/o a
+                    if model_name == 'CompenRT (512->1024) w/o a':
+                        pu_net = Models.PUNetWithoutAttention512()
+                        if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
+                        compen_rt = Models.CompenRTWithoutAttention(gd_net, pu_net)
                     if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt,device_ids=device_ids).to(device)
 
                     if train_option['pretrain_csr'] !='':

@@ -49,7 +49,7 @@ train_option_default = {'max_iters': 1,
                         'l2_reg': 1e-4,  # l2 regularization
                         'device': device,
                         'pre-trained': False,
-                        'pretrain_csr': '/home/mingjie/code/code/512/checkpoint/bubble_1_CompenRT_l1+l2+ssim+diff_500_4_2000_0.001_0.001_0.5_900_0.0001.pth',
+                        'pretrain_csr': '',
                         'pretrain_cmp': '',
                         'plot_on': False,  # plot training progress using visdom (disable for faster training)
                         'train_plot_rate': 100,  # training and visdom plot rate (increase for faster training)

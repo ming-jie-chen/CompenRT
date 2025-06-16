@@ -274,7 +274,379 @@ class PUNet512(nn.Module):
         return x
 
 
+# # CompenTransNet256
+class CompenTransNet256(nn.Module):
+    def __init__(self):
+        super(CompenTransNet256, self).__init__()
+        self.name = self.__class__.__name__
+        self.relu = nn.ReLU()
+        self.simplified = False
+        # siamese encoder
+        self.conv1 = nn.Conv2d(3, 32, 3, 2, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 2, 1)
+        self.conv3 = nn.Conv2d(64, 128, 3, 1, 1)
+        self.conv4 = nn.Conv2d(128, 256, 3, 1, 1)
+        self.conv5 = nn.Conv2d(256, 128, 3, 1, 1)
+        # transposed conv
+        self.transConv1 = nn.ConvTranspose2d(128, 64,3,2,1,1)
+        self.transConv2 = nn.ConvTranspose2d(64, 32, 2,2,0)
 
+        # s1
+        self.skipConv11 = nn.Conv2d(3, 32, 3, 1, 1)
+        self.skipConv12 = nn.Conv2d(32, 64,3,1,1)
+        # s2
+        self.skipConv21 = nn.Conv2d(32, 64, 1,1,0)
+        self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
+
+        self.attention1 = AttentionModel(128)
+        self.attention2 = AttentionModel(64)
+        self.trans1=nn.ConvTranspose2d(64,64,2,2,0)
+        self.trans2=nn.ConvTranspose2d(32,3,2,2,0)
+
+        self.up_conv1 = nn.Conv2d(64, 64, 3, 1, 1)
+        self.up_conv2 = nn.Conv2d(32, 3, 3, 1, 1)
+        # stores biases of surface feature branch (net simplification)
+        self.register_buffer('res1_s_pre', None)
+        self.register_buffer('res2_s_pre', None)
+        self.register_buffer('res3_s_pre', None)
+
+        # initialization function, first checks the module type,
+        def _initialize_weights(m):
+            if type(m) == nn.Conv2d:
+                nn.init.kaiming_normal_(m.weight)
+
+        self.apply(_initialize_weights)
+
+    # simplify trained model by trimming surface branch to biases
+    def simplify(self, s):
+        res1_s = self.relu(self.skipConv11(s))
+        res1_s = self.relu(self.skipConv12(res1_s))
+        self.res1_s_pre = res1_s
+
+        s = self.relu(self.conv1(s))
+
+        res2_s = self.skipConv21(s)
+        res2_s = self.relu(res2_s)
+        res2_s = self.skipConv22(res2_s)
+        self.res2_s_pre = res2_s
+
+        s = self.relu(self.conv2(s))
+        s = self.relu(self.conv3(s))
+        self.res3_s_pre = s
+
+        self.res1_s_pre = self.res1_s_pre.squeeze()
+        self.res2_s_pre = self.res2_s_pre.squeeze()
+        self.res3_s_pre = self.res3_s_pre.squeeze()
+
+        self.simplified = True
+
+    # x is the input uncompensated image, s is a surface image, the resolution is 256×256
+    def forward(self, x, s):
+        # surface feature extraction
+
+        # alternate between surface and image branch
+        if self.simplified:
+            res1_s = self.res1_s_pre
+            res2_s = self.res2_s_pre
+            res3_s = self.res3_s_pre
+        else:
+            res1_s = self.relu(self.skipConv11(s))
+            res1_s = self.skipConv12(res1_s)
+
+            s = self.relu(self.conv1(s))
+
+            res2_s = self.skipConv21(s)
+            res2_s = self.relu(res2_s)
+            res2_s = self.skipConv22(res2_s)
+
+            s = self.relu(self.conv2(s))
+            res3_s = self.relu(self.conv3(s))
+
+
+        res1 = self.relu(self.skipConv11(x))
+        res1 = self.skipConv12(res1)
+
+        res1 =res1-res1_s
+
+        x = self.relu(self.conv1(x))
+
+        res2 = self.skipConv21(x)
+        res2 = self.relu(res2)
+        res2 = self.skipConv22(res2)
+        res2 =res2-res2_s
+        x = self.relu(self.conv2(x))
+        x = self.relu(self.conv3(x))
+
+        x = x - res3_s
+        x=self.relu(self.conv4(x))
+
+        x = self.relu(self.conv5(x))
+
+        x = self.attention1(x)
+        x=self.relu(self.transConv1(x)+res2)
+        x=self.relu(self.trans1(x)+res1)
+
+        x=self.attention2(x)
+        x=self.relu(self.transConv2(x))
+        x=self.relu(self.trans2(x))
+
+        x = torch.clamp(x, max=1)
+        x = torch.clamp(x, min=0)
+        return x
+
+#CompenTrans512
+class CompenTrans512(nn.Module):
+    def __init__(self):
+        super(CompenTrans512, self).__init__()
+        self.name = self.__class__.__name__
+        self.relu = nn.ReLU()
+        self.simplified = False
+        # siamese encoder
+        self.conv1 = nn.Conv2d(3, 32, 3, 2, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 2, 1)
+        self.conv3 = nn.Conv2d(64, 128, 3, 2, 1)
+        self.conv4 = nn.Conv2d(128, 256, 3, 1, 1)
+        self.conv5 = nn.Conv2d(256, 128, 3, 1, 1)
+        # transposed conv
+        self.transConv1 = nn.ConvTranspose2d(128, 64,3,2,1,1)
+        self.transConv2 = nn.ConvTranspose2d(64, 32, 2,2,0)
+        # output layer
+        # s1
+        self.skipConv11 = nn.Conv2d(3, 32, 3, 1, 1)
+        self.skipConv12 = nn.Conv2d(32, 32,3,1,1)
+        # s2
+        self.skipConv21 = nn.Conv2d(32, 64, 1,1,0)
+        self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
+
+        #s3
+        self.skipConv31=nn.Conv2d(64,64,3,1,1)
+
+        self.attention1 = AttentionModel(128)
+        self.trans1=nn.ConvTranspose2d(64,64,2,2,0)
+        self.trans2=nn.ConvTranspose2d(32,3,2,2,0)
+
+        self.up_conv1 = nn.Conv2d(64, 64, 3, 1, 1)
+        self.up_conv2 = nn.Conv2d(32, 3, 3, 1, 1)
+        # stores biases of surface feature branch (net simplification)
+        self.register_buffer('res1_s_pre', None)
+        self.register_buffer('res2_s_pre', None)
+        self.register_buffer('res3_s_pre', None)
+
+        # initialization function, first checks the module type,
+        def _initialize_weights(m):
+            if type(m) == nn.Conv2d:
+                nn.init.kaiming_normal_(m.weight)
+
+        self.apply(_initialize_weights)
+
+    # simplify trained model by trimming surface branch to biases
+    def simplify(self, s):
+        res1_s = self.relu(self.skipConv12(s))
+        res1_s = self.skipConv13(res1_s)
+        self.res1_s_pre = res1_s
+
+        s = self.relu(self.conv1(s))
+
+        res2_s = self.skipConv21(s)
+        res2_s = self.relu(res2_s)
+        res2_s = self.skipConv22(res2_s)
+        self.res2_s_pre = res2_s
+
+        s = self.relu(self.conv2(s))
+        self.res3_s_pre = s
+        s = self.relu(self.conv3(s))
+        self.res4_s_pre = self.skipConv31(s)
+
+        self.res1_s_pre = self.res1_s_pre.squeeze()
+        self.res2_s_pre = self.res2_s_pre.squeeze()
+        self.res3_s_pre = self.res3_s_pre.squeeze()
+        self.res4_s_pre = self.res4_s_pre.squeeze()
+        self.simplified = True
+
+    # x is the input uncompensated image, s is a surface image, the resolution is 512×512
+    def forward(self, x, s):
+        # surface feature extraction
+
+        # alternate between surface and image branch
+        if self.simplified:
+            res1_s = self.res1_s_pre
+            res2_s = self.res2_s_pre
+            res3_s = self.res3_s_pre
+            res4_s = self.res4_s_pre
+        else:
+
+            res1_s = self.relu(self.skipConv11(s))
+            res1_s = self.skipConv12(res1_s)
+
+            s = self.relu(self.conv1(s))
+
+            res2_s = self.skipConv21(s)
+            res2_s = self.relu(res2_s)
+            res2_s = self.skipConv22(res2_s)
+
+            s = self.relu(self.conv2(s))
+            res3_s=self.skipConv31(s)
+            s = self.relu(self.conv3(s))
+            res4_s=self.relu(self.conv4(s))
+
+        res1 = self.relu(self.skipConv11(x))
+        res1 = self.skipConv12(res1)
+        res1 =res1-res1_s
+
+        x = self.relu(self.conv1(x))
+
+        res2 = self.skipConv21(x)
+        res2 = self.relu(res2)
+        res2 = self.skipConv22(res2)
+        res2 =res2-res2_s
+
+        x = self.relu(self.conv2(x))
+
+        res3=self.skipConv31(x)
+        res3=res3-res3_s
+        x = self.relu(self.conv3(x))
+
+        x=self.relu(self.conv4(x))
+        x = x - res4_s
+        x = self.relu(self.conv5(x))
+
+        x = self.attention1(x)
+        x=self.relu(self.transConv1(x)+res3)
+        x=self.relu(self.trans1(x)+res2)
+
+        x=self.relu(self.transConv2(x)+res1)
+        x=self.relu(self.trans2(x))
+        x = torch.clamp(x, max=1)
+        x = torch.clamp(x, min=0)
+        return x
+
+
+# PUNet without attention module at 512×512 resolution input
+class PUNetWithoutAttention512(nn.Module):
+    def __init__(self):
+        super(PUNetWithoutAttention512, self).__init__()
+        self.name = self.__class__.__name__
+        self.relu = nn.ReLU()
+        self.simplified = False
+        # siamese encoder
+        self.conv1 = nn.Conv2d(3, 32, 3, 2, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 2, 1)
+        self.conv3 = nn.Conv2d(64, 128, 3, 2, 1)
+        self.conv4 = nn.Conv2d(128, 256, 3, 1, 1)
+        self.conv5 = nn.Conv2d(256, 128, 3, 1, 1)
+        # transposed conv
+        self.transConv1 = nn.ConvTranspose2d(128, 64,3,2,1,1)
+        self.transConv2 = nn.ConvTranspose2d(64, 32, 2,2,0)
+        # output layer
+        # s1
+        self.skipConv11 = nn.Conv2d(3, 32, 3, 1, 1)
+        self.skipConv12 = nn.Conv2d(32, 32,3,1,1)
+        # s2
+        self.skipConv21 = nn.Conv2d(32, 64, 1,1,0)
+        self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
+
+        #s3
+        self.skipConv31=nn.Conv2d(64,64,3,1,1)
+
+        self.upsample1 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+        self.upsample2 = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+
+        self.up_conv1 = nn.Conv2d(64, 64, 3, 1, 1)
+        self.up_conv2 = nn.Conv2d(32, 3, 3, 1, 1)
+        # stores biases of surface feature branch (net simplification)
+        self.register_buffer('res1_s_pre', None)
+        self.register_buffer('res2_s_pre', None)
+        self.register_buffer('res3_s_pre', None)
+
+        # initialization function, first checks the module type,
+        def _initialize_weights(m):
+            if type(m) == nn.Conv2d:
+                nn.init.kaiming_normal_(m.weight)
+
+        self.apply(_initialize_weights)
+
+    # simplify trained model by trimming surface branch to biases
+    def simplify(self, s):
+        res1_s = self.relu(self.skipConv12(s))
+        res1_s = self.skipConv13(res1_s)
+        self.res1_s_pre = res1_s
+
+        s = self.relu(self.conv1(s))
+
+        res2_s = self.skipConv21(s)
+        res2_s = self.relu(res2_s)
+        res2_s = self.skipConv22(res2_s)
+        self.res2_s_pre = res2_s
+
+        s = self.relu(self.conv2(s))
+        self.res3_s_pre = s
+        s = self.relu(self.conv3(s))
+        self.res4_s_pre = self.skipConv31(s)
+
+        self.res1_s_pre = self.res1_s_pre.squeeze()
+        self.res2_s_pre = self.res2_s_pre.squeeze()
+        self.res3_s_pre = self.res3_s_pre.squeeze()
+        self.res4_s_pre = self.res4_s_pre.squeeze()
+        self.simplified = True
+
+    # x is the input uncompensated image, s is a surface image, the resolution is 512×512
+    def forward(self, x, s):
+        # surface feature extraction
+
+        # alternate between surface and image branch
+        if self.simplified:
+            res1_s = self.res1_s_pre
+            res2_s = self.res2_s_pre
+            res3_s = self.res3_s_pre
+            res4_s = self.res4_s_pre
+        else:
+
+            res1_s = self.relu(self.skipConv11(s))
+            res1_s = self.skipConv12(res1_s)
+
+            s = self.relu(self.conv1(s))
+
+            res2_s = self.skipConv21(s)
+            res2_s = self.relu(res2_s)
+            res2_s = self.skipConv22(res2_s)
+
+            s = self.relu(self.conv2(s))
+            res3_s=self.skipConv31(s)
+            s = self.relu(self.conv3(s))
+            res4_s=self.relu(self.conv4(s))
+
+        res1 = self.relu(self.skipConv11(x))
+        res1 = self.skipConv12(res1)
+        res1 =res1-res1_s
+
+        x = self.relu(self.conv1(x))
+
+        res2 = self.skipConv21(x)
+        res2 = self.relu(res2)
+        res2 = self.skipConv22(res2)
+        res2 =res2-res2_s
+
+        x = self.relu(self.conv2(x))
+
+        res3=self.skipConv31(x)
+        res3=res3-res3_s
+        x = self.relu(self.conv3(x))
+
+        x=self.relu(self.conv4(x))
+        x = x - res4_s
+        x = self.relu(self.conv5(x))
+
+        x=self.relu(self.transConv1(x)+res3)
+        x = self.upsample1(x)
+        x = self.relu(self.up_conv1(x)+res2)
+
+        x=self.relu(self.transConv2(x)+res1)
+        x = self.upsample2(x)
+        x = self.up_conv2(x)
+        x = torch.clamp(x, max=1)
+        x = torch.clamp(x, min=0)
+        return x
+    
 class GridRefine(nn.Module):
     def __init__(self):
         super(GridRefine, self).__init__()
@@ -399,6 +771,216 @@ class GDNet(nn.Module):
         x = F.grid_sample(x, fine_grid)
         return x
 
+# CompenNeSt (journal version)
+class CompenNeSt(nn.Module):
+    def __init__(self):
+        super(CompenNeSt, self).__init__()
+        self.name = self.__class__.__name__
+        self.relu = nn.ReLU()
+
+        self.simplified = False
+
+        # siamese encoder
+        self.conv1 = nn.Conv2d(3, 32, 3, 2, 1)
+        self.conv2 = nn.Conv2d(32, 64, 3, 2, 1)
+        self.conv3 = nn.Conv2d(64, 128, 3, 1, 1)
+        self.conv4 = nn.Conv2d(128, 256, 3, 1, 1)
+        self.conv5 = nn.Conv2d(256, 128, 3, 1, 1)
+
+        # transposed conv
+        self.transConv1 = nn.ConvTranspose2d(128, 64, 3, 2, 1, 1)
+        self.transConv2 = nn.ConvTranspose2d(64, 32, 2, 2, 0)
+
+        # output layer
+        self.conv6 = nn.Conv2d(32, 3, 3, 1, 1)
+
+        # skip layers (see s3 in forward)
+        # s1
+        self.skipConv11 = nn.Conv2d(3, 3, 1, 1, 0)
+        self.skipConv12 = nn.Conv2d(3, 3, 3, 1, 1)
+        self.skipConv13 = nn.Conv2d(3, 3, 3, 1, 1)
+
+        # s2
+        self.skipConv21 = nn.Conv2d(32, 64, 1, 1, 0)
+        self.skipConv22 = nn.Conv2d(64, 64, 3, 1, 1)
+
+        # stores biases of surface feature branch (net simplification)
+        self.register_buffer('res1_s_pre', None)
+        self.register_buffer('res2_s_pre', None)
+        self.register_buffer('res3_s_pre', None)
+
+        # initialization function, first checks the module type,
+        def _initialize_weights(m):
+            if type(m) == nn.Conv2d:
+                nn.init.kaiming_normal_(m.weight)
+
+        self.apply(_initialize_weights)
+
+    # simplify trained model by trimming surface branch to biases
+    def simplify(self, s):
+        res1_s = self.relu(self.skipConv11(s))
+        res1_s = self.relu(self.skipConv12(res1_s))
+        res1_s = self.skipConv13(res1_s)
+        self.res1_s_pre = res1_s
+
+        s = self.relu(self.conv1(s))
+
+        res2_s = self.skipConv21(s)
+        res2_s = self.relu(res2_s)
+        res2_s = self.skipConv22(res2_s)
+        self.res2_s_pre = res2_s
+
+        s = self.relu(self.conv2(s))
+        s = self.relu(self.conv3(s))
+        self.res3_s_pre = s
+
+        self.res1_s_pre = self.res1_s_pre.squeeze()
+        self.res2_s_pre = self.res2_s_pre.squeeze()
+        self.res3_s_pre = self.res3_s_pre.squeeze()
+
+        self.simplified = True
+
+    # x is the input uncompensated image, s is a 1x2sx2s56x2s56 surface image
+    def forward(self, x, s):
+        # surface feature extraction
+
+        # alternate between surface and image branch
+        if self.simplified:
+            res1_s = self.res1_s_pre
+            res2_s = self.res2_s_pre
+            res3_s = self.res3_s_pre
+        else:
+            res1_s = self.relu(self.skipConv11(s))
+            res1_s = self.relu(self.skipConv12(res1_s))
+            res1_s = self.skipConv13(res1_s)
+
+            s = self.relu(self.conv1(s))
+
+            res2_s = self.skipConv21(s)
+            res2_s = self.relu(res2_s)
+            res2_s = self.skipConv22(res2_s)
+
+            s = self.relu(self.conv2(s))
+            res3_s = self.relu(self.conv3(s))
+
+        res1 = self.relu(self.skipConv11(x))
+        res1 = self.relu(self.skipConv12(res1))
+        res1 = self.skipConv13(res1)
+        res1 -= res1_s
+
+        x = self.relu(self.conv1(x))
+
+        res2 = self.skipConv21(x)
+        res2 = self.relu(res2)
+        res2 = self.skipConv22(res2)
+        res2 -= res2_s
+
+        x = self.relu(self.conv2(x))
+
+        x = self.relu(self.conv3(x))
+        x -= res3_s # s3
+
+        x = self.relu(self.conv4(x))
+        x = self.relu(self.conv5(x))
+
+        x = self.relu(self.transConv1(x) + res2)
+        x = self.relu(self.transConv2(x))
+        x = self.relu(self.conv6(x) + res1)
+
+        x = torch.clamp(x, max=1)
+
+        return x
+
+
+# WarpingNet
+class WarpingNet(nn.Module):
+    def __init__(self, grid_shape=(6, 6), out_size=(256, 256), with_refine=True):
+        super(WarpingNet, self).__init__()
+        self.grid_shape = grid_shape
+        self.out_size = out_size
+        self.with_refine = with_refine  # becomes WarpingNet w/o refine if set to false
+        self.name = 'WarpingNet' if not with_refine else 'WarpingNet_without_refine'
+
+        # relu
+        self.relu = nn.ReLU()
+        self.leakyRelu = nn.LeakyReLU(0.1)
+
+        # final refined grid
+        self.register_buffer('fine_grid', None)
+
+        # affine params
+        self.affine_mat = nn.Parameter(torch.Tensor([1, 0, 0, 0, 1, 0]).view(-1, 2, 3))
+
+        # tps params
+        self.nctrl = self.grid_shape[0] * self.grid_shape[1]
+        self.nparam = (self.nctrl + 2)
+        ctrl_pts = pytorch_tps.uniform_grid(grid_shape)
+        self.register_buffer('ctrl_pts', ctrl_pts.view(-1, 2))
+        self.theta = nn.Parameter(torch.ones((1, self.nparam * 2), dtype=torch.float32).view(-1, self.nparam, 2) * 1e-3)
+
+        # initialization function, first checks the module type,
+        def init_normal(m):
+            if type(m) == nn.Conv2d:
+                nn.init.normal_(m.weight, 0, 1e-4)
+
+        # grid refinement net
+        if self.with_refine:
+            self.grid_refine_net = nn.Sequential(
+                nn.Conv2d(2, 32, 3, 2, 1),
+                self.relu,
+                nn.Conv2d(32, 64, 3, 2, 1),
+                self.relu,
+                nn.ConvTranspose2d(64, 32, 2, 2, 0),
+                self.relu,
+                nn.ConvTranspose2d(32, 2, 2, 2, 0),
+                self.leakyRelu
+            )
+            self.grid_refine_net.apply(init_normal)
+        else:
+            self.grid_refine_net = None  # WarpingNet w/o refine
+
+    # initialize WarpingNet's affine matrix to the input affine_vec
+    def set_affine(self, affine_vec):
+        self.affine_mat.data = torch.Tensor(affine_vec).view(-1, 2, 3)
+
+    # simplify trained model to a single sampling grid for faster testing
+    def simplify(self, x):
+        # generate coarse affine and TPS grids
+        coarse_affine_grid = F.affine_grid(self.affine_mat, torch.Size([1, x.shape[1], x.shape[2], x.shape[3]])).permute((0, 3, 1, 2))
+        coarse_tps_grid = pytorch_tps.tps_grid(self.theta, self.ctrl_pts, (1, x.size()[1]) + self.out_size)
+
+        # use TPS grid to sample affine grid
+        tps_grid = F.grid_sample(coarse_affine_grid, coarse_tps_grid)
+
+        # refine TPS grid using grid refinement net and save it to self.fine_grid
+        if self.with_refine:
+            self.fine_grid = torch.clamp(self.grid_refine_net(tps_grid) + tps_grid, min=-1, max=1).permute((0, 2, 3, 1))
+        else:
+            self.fine_grid = torch.clamp(tps_grid, min=-1, max=1).permute((0, 2, 3, 1))
+
+    def forward(self, x):
+
+        if self.fine_grid is None:
+            # not simplified (training/validation)
+            # generate coarse affine and TPS grids
+            coarse_affine_grid = F.affine_grid(self.affine_mat, torch.Size([1, x.shape[1], x.shape[2], x.shape[3]])).permute((0, 3, 1, 2))
+            coarse_tps_grid = pytorch_tps.tps_grid(self.theta, self.ctrl_pts, (1, x.size()[1]) + self.out_size)
+
+            # use TPS grid to sample affine grid
+            tps_grid = F.grid_sample(coarse_affine_grid, coarse_tps_grid).repeat(x.shape[0], 1, 1, 1)
+
+            # refine TPS grid using grid refinement net and save it to self.fine_grid
+            if self.with_refine:
+                fine_grid = torch.clamp(self.grid_refine_net(tps_grid) + tps_grid, min=-1, max=1).permute((0, 2, 3, 1))
+            else:
+                fine_grid = torch.clamp(tps_grid, min=-1, max=1).permute((0, 2, 3, 1))
+        else:
+            # simplified (testing)
+            fine_grid = self.fine_grid.repeat(x.shape[0], 1, 1, 1)
+
+        # warp
+        x = F.grid_sample(x, fine_grid)
+        return x
 
 class CompenRTFast(nn.Module):
     def __init__(self, gd_net=None, pu_net=None):
@@ -431,6 +1013,100 @@ class CompenRT(nn.Module):
         # initialize from existing models or create new models
         self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else GDNet()
         self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else PUNet512()
+    # simplify trained model to a single sampling grid for faster testing
+    def simplify(self, s):
+        self.gd_net.simplify(s)
+        self.pu_net.simplify(self.gd_net(s))
+
+    def forward(self, x, s):
+        # geometric correction using GDNet (both x and s)
+        x = self.gd_net(x)
+        s = self.gd_net(s)
+        # x and s is Bx3x512x512 warped image
+        # photometric compensation using PUNet
+        x= self.pu_net(x,s)
+        return x
+
+
+
+class CmpBi(nn.Module):
+    def __init__(self, gd_net=None, pu_net=None):
+        super(CmpBi, self).__init__()
+        self.name = self.__class__.__name__
+
+        # initialize from existing models or create new models
+        self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else WarpingNet()
+        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else CompenNeSt()
+    # simplify trained model to a single sampling grid for faster testing
+    def simplify(self, s):
+        self.gd_net.simplify(s)
+        self.pu_net.simplify(self.gd_net(s))
+
+    def forward(self, x, s):
+        # geometric correction using WarpingNet (both x and s)
+        x = self.gd_net(x)
+        s = self.gd_net(s)
+        # x and s is Bx3x256x256 warped image
+        # photometric compensation using CompenNeSt
+        x= self.pu_net(x,s)
+        x = F.interpolate(x, size=(1024, 1024), mode='bicubic')
+        x = torch.clamp(x, min=0, max=1)
+        return x
+
+
+class CmpTrans256(nn.Module):
+    def __init__(self, gd_net=None, pu_net=None):
+        super(CmpTrans256, self).__init__()
+        self.name = self.__class__.__name__
+
+        # initialize from existing models or create new models
+        self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else GDNet()
+        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else CompenTransNet256()
+    # simplify trained model to a single sampling grid for faster testing
+    def simplify(self, s):
+        self.gd_net.simplify(s)
+        self.pu_net.simplify(self.gd_net(s))
+
+    def forward(self, x, s):
+        # geometric correction using GDNet (both x and s)
+        x = self.gd_net(x)
+        s = self.gd_net(s)
+        # x and s is Bx3x256x256 warped image
+        # photometric compensation using CompenTransNet
+        x= self.pu_net(x,s)
+        return x
+
+class CmpTrans512(nn.Module):
+    def __init__(self, gd_net=None, pu_net=None):
+        super(CmpTrans512, self).__init__()
+        self.name = self.__class__.__name__
+
+        # initialize from existing models or create new models
+        self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else GDNet()
+        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else CompenTransNet512()
+    # simplify trained model to a single sampling grid for faster testing
+    def simplify(self, s):
+        self.gd_net.simplify(s)
+        self.pu_net.simplify(self.gd_net(s))
+
+    def forward(self, x, s):
+        # geometric correction using GDNet (both x and s)
+        x = self.gd_net(x)
+        s = self.gd_net(s)
+        # x and s is Bx3x512x512 warped image
+        # photometric compensation using CompenTransNet
+        x= self.pu_net(x,s)
+        return x
+
+
+class CompenRTWithoutAttention(nn.Module):
+    def __init__(self, gd_net=None, pu_net=None):
+        super(CompenRTWithoutAttention, self).__init__()
+        self.name = self.__class__.__name__
+
+        # initialize from existing models or create new models
+        self.gd_net = copy.deepcopy(gd_net.module) if gd_net is not None else GDNet()
+        self.pu_net = copy.deepcopy(pu_net.module) if pu_net is not None else PUNetWithoutAttention512()
     # simplify trained model to a single sampling grid for faster testing
     def simplify(self, s):
         self.gd_net.simplify(s)
