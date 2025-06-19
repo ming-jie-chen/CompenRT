@@ -1072,7 +1072,7 @@ class CmpTrans256(nn.Module):
         x = self.gd_net(x)
         s = self.gd_net(s)
         # x and s is Bx3x256x256 warped image
-        # photometric compensation using CompenTransNet
+        # photometric compensation using CompenTransNet256
         x= self.pu_net(x,s)
         return x
 
@@ -1094,7 +1094,7 @@ class CmpTrans512(nn.Module):
         x = self.gd_net(x)
         s = self.gd_net(s)
         # x and s is Bx3x512x512 warped image
-        # photometric compensation using CompenTransNet
+        # photometric compensation using CompenTransNet512
         x= self.pu_net(x,s)
         return x
 
@@ -1117,7 +1117,7 @@ class CompenRTWithoutAttention(nn.Module):
         x = self.gd_net(x)
         s = self.gd_net(s)
         # x and s is Bx3x512x512 warped image
-        # photometric compensation using PUNet
+        # photometric compensation using PUNetWithoutAttention512
         x= self.pu_net(x,s)
         return x
 
