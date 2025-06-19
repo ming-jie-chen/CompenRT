@@ -112,9 +112,13 @@ for data_name in data_list:
                 
                 # set seed of rng for repeatability
                 resetRNGseed(0)
-
-                # create a GDNet
-                gd_net = Models.GDNet(out_size=input_lr_size)
+                if model_name == 'CmpBi (256->1024)':
+                    train_option['lr_drop_ratio']= 0.2
+                    train_option['lr_drop_rate'] = 1000
+                    gd_net = Models.WarpingNet(out_size=input_lr_size)
+                else:
+                    # create a GDNet
+                    gd_net = Models.GDNet(out_size=input_lr_size)
 
                 if torch.cuda.device_count() >= 1: gd_net = nn.DataParallel(gd_net, device_ids=device_ids).to(device)
 
@@ -130,6 +134,32 @@ for data_name in data_list:
                     if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
                         device)
                     compen_rt = Models.CompenRT(gd_net, pu_net).cuda()
+                #  CmpBi (256->1024)
+                if model_name == 'CmpBi (256->1024)':
+                    pu_net = Models.CompenNeSt()
+                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net,
+                                                                                    device_ids=device_ids).to(
+                            device)
+                    compen_rt = Models.CmpTrans256(gd_net, pu_net)
+
+                #  Cmptrans (256->1024)
+                if model_name == 'CmpTrans (256->1024)':
+                    pu_net = Models.CompenTransNet256()
+                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
+                        device)
+                    compen_rt = Models.CmpTrans256(gd_net, pu_net)
+                #  Cmptrans (512->1024)
+                if model_name == 'CmpTrans (512->1024)':
+                    pu_net = Models.CompenTransNet512()
+                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
+                            device)
+                    compen_rt = Models.CmpTrans512(gd_net, pu_net)
+                #  CompenRT (512->1024) w/o a
+                if model_name == 'CompenRT (512->1024) w/o a':
+                    pu_net = Models.PUNetWithoutAttention512()
+                    if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
+                            device)
+                    compen_rt = Models.CompenRTWithoutAttention(gd_net, pu_net)
 
                 if torch.cuda.device_count() >= 1: compen_rt = nn.DataParallel(compen_rt, device_ids=device_ids).to(
                         device)

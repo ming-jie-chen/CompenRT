@@ -145,9 +145,12 @@ if __name__ == '__main__':
                     log_file = open(fullfile(log_dir, log_file_name), 'a')
                     # set seed of rng for repeatability
                     resetRNGseed(0)
-
-                    # create a GDNet
-                    gd_net = Models.GDNet(out_size=input_lr_size) #The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
+                    if model_name == 'CmpBi (256->1024)':
+                        # create a WarpingNet
+                        gd_net = Models.WarpingNet(out_size=input_lr_size)  # The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
+                    else:
+                        # create a GDNet
+                        gd_net = Models.GDNet(out_size=input_lr_size) #The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
                     # initialize GDNet with affine transformation (remember grid_sample is inverse warp, so src is the the desired warp
                     src_pts = np.array([[-1, -1], [1, -1], [1, 1]]).astype(np.float32)
                     dst_pts = np.array(mask_corners[0][0:3]).astype(np.float32)
@@ -167,6 +170,15 @@ if __name__ == '__main__':
                         if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(device)
 
                         compen_rt = Models.CompenRT(gd_net, pu_net)
+
+                    #  CmpBi (256->1024)
+                    if model_name == 'CmpBi (256->1024)':
+                        pu_net = Models.CompenNeSt()
+                        if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net,
+                                                                                        device_ids=device_ids).to(
+                            device)
+                        compen_rt = Models.CmpTrans256(gd_net, pu_net)
+
                     #  Cmptrans (256->1024)
                     if model_name == 'CmpTrans (256->1024)':
                         pu_net = Models.CompenTransNet256()
@@ -205,8 +217,6 @@ if __name__ == '__main__':
                     uncmp_ssim = 0.0
                     uncmp_diff = 0.0
 
-
-                        # %%
 
                     # save results to log file
                     ret_str = '{:30s}{:<30}{:<20}{:<15}{:<15}{:<15}{:<30}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}{:<15.4f}\n'

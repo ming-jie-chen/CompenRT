@@ -2,7 +2,7 @@
 SOFTWARE LICENSE AGREEMENT
 
 ACADEMIC OR NON-PROFIT ORGANIZATION NONCOMMERCIAL RESEARCH USE ONLY
-Copyright (c) 2025 Mingjie Chen
+Copyright (c) 2025 Mingjie Chen, Bingyao Huang
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met: 
