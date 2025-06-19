@@ -16,12 +16,7 @@ if torch.cuda.device_count() >= 1:
 else:
     print('Train with CPU!')
 
-
-
-
-
-
-# %% K=20 setups
+# %% K=19 setups
 dataset_root = fullfile(os.getcwd(), '../../data/1024')
 
 data_list = [
@@ -122,13 +117,14 @@ for data_name in data_list:
 
                 if torch.cuda.device_count() >= 1: gd_net = nn.DataParallel(gd_net, device_ids=device_ids).to(device)
 
+                #  CompenRT (256->1024)
                 if model_name == 'CompenRT (256->1024)':
                     pu_net = Models.PUNet256()
                     if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
                         device)
                     compen_rt = Models.CompenRTFast(gd_net, pu_net).cuda()
 
-
+                #  CompenRT (512->1024)
                 if model_name == 'CompenRT (512->1024)':
                     pu_net = Models.PUNet512()
                     if torch.cuda.device_count() >= 1: pu_net = nn.DataParallel(pu_net, device_ids=device_ids).to(
