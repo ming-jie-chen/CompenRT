@@ -146,6 +146,8 @@ if __name__ == '__main__':
                     # set seed of rng for repeatability
                     resetRNGseed(0)
                     if model_name == 'CmpBi (256->1024)':
+                        train_option['lr_drop_ratio'] = 0.2
+                        train_option['lr_drop_rate'] = 1000
                         # create a WarpingNet
                         gd_net = Models.WarpingNet(out_size=input_lr_size)  # The outsize parameter is used to adjust the size of the output resolution of the geometry correction.
                     else:
