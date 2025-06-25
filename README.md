@@ -60,4 +60,4 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
 - Feel free to open an issue if you have any questions/suggestions/concerns 😁.
 
 ## License
-This software is freely available for non-profit non-commercial use, and may be redistributed under the conditions in [license](LICENSE).
+This software is freely available for non-profit non-commercial use, and may be redistributed under the conditions in [license](https://github.com/ming-jie-chen/CompenRT/blob/master/LICENSE.txt).
