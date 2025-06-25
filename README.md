@@ -6,7 +6,12 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
 ## Datasets
 * [Full compensation](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) (19 setups,same as [CompenHR](https://github.com/cyxwang/CompenHR) dataset)
 
-
+## Prerequisites
+* PyTorch compatible GPU
+* Python 3.8.18
+* visdom (for visualization)
+* Other packages are listed in [requirements.txt](https://github.com/cyxwang/CompenHR).
+  
 ## Usage
    1. Clone this repo:
   
