@@ -58,3 +58,6 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
 - We thank the authors of CompenHR for providing the code (count_hook.py, profile1.py) for statistical parameter quantities and FLOPs.
 - We thank Jijiang Li for valuable discussion, proof reading, and help with the experiments.
 - Feel free to open an issue if you have any questions/suggestions/concerns 😁.
+
+## License
+This software is freely available for non-profit non-commercial use, and may be redistributed under the conditions in [license](LICENSE).
