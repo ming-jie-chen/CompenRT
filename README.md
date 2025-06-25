@@ -17,7 +17,7 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
       
      cd CompenRT/src/python  
      
-   3. Download CompenRT [benchmark dataset](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) and extract to ‘data/’
+   3. Download CompenRT [benchmark dataset](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) and extract to [‘data/’](https://github.com/ming-jie-chen/CompenRT/tree/master/data)
      
    4. Start visdom by typing:
       
