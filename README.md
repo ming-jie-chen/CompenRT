@@ -4,12 +4,7 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
 
         
 ## Datasets
-The high resolution compensation datasets: 
-
-[train](https://pan.baidu.com/s/1kCSd9k4dpDc2tGhv7V7UGQ?pwd=nm2a)
-[test](https://pan.baidu.com/s/1Ia_ootb8iiglPi0t0IiVaQ?pwd=7mfu)
-[ref](https://pan.baidu.com/s/1Km1EIDOYyC3ya_yzPv00sg?pwd=4m7s)
-[bubble](https://pan.baidu.com/s/1eDI971EobKR9svCYFMxzbA?pwd=saqg)
+* [Full compensation](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) (19 setups,same as [CompenHR](https://github.com/cyxwang/CompenHR) dataset)
 
 
 ## Usage
@@ -22,7 +17,7 @@ The high resolution compensation datasets:
       
      cd CompenRT/src/python  
      
-   3. Download dataset and extract to ‘data/’
+   3. Download CompenRT [benchmark dataset](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) and extract to ‘data/’
      
    4. Start visdom by typing:
       
