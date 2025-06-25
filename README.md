@@ -1,10 +1,10 @@
 # Real-Time High-Resolution Projector Compensation [ICME'25] 
 ## Introduction
-This is PyTorch implementation of the paper“Real-Time High-Resolution Projector Compensation”.
+This is PyTorch implementation of the paper “Real-Time High-Resolution Projector Compensation”.
 
         
 ## Datasets
-* [Full compensation](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) (19 setups,same as [CompenHR](https://github.com/cyxwang/CompenHR) dataset)
+* [Full compensation](https://pan.baidu.com/s/1XblKFnsIBhjd2sK7aQCNDA?pwd=qnh5) (19 setups, same as [CompenHR](https://github.com/cyxwang/CompenHR) dataset)
 
 ## Prerequisites
 * PyTorch compatible GPU
