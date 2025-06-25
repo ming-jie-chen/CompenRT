@@ -1,4 +1,4 @@
-# CompenRT
+# [ICME'25] Real-Time High-Resolution Projector Compensation
 ## Introduction
 This is PyTorch implementation of the paper“Real-Time High-Resolution Projector Compensation”.
 
