@@ -9,7 +9,7 @@ This is PyTorch implementation of the paper“Real-Time High-Resolution Projecto
 ## Prerequisites
 * PyTorch compatible GPU
 * Python 3.8.18
-* visdom (for visualization)
+* [visdom](https://github.com/fossasia/visdom) (for visualization)
 * Other packages are listed in [requirements.txt](https://github.com/ming-jie-chen/CompenRT/blob/master/requirements.txt).
   
 ## Usage
