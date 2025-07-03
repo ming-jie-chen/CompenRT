@@ -51,33 +51,27 @@ def tps(theta, ctrl, grid):
         Function values at each grid location in dx and dy.
     '''
 
-    N, H, W, _ = grid.size()#[1,1024,1024,3]
+    N, H, W, _ = grid.size()
+
     if ctrl.dim() == 2:
-        ctrl = ctrl.expand(N, *ctrl.size())#[1,25,2]
-    T = ctrl.shape[1]#25
+        ctrl = ctrl.expand(N, *ctrl.size())
 
-    diff = grid[..., 1:].unsqueeze(-2) - ctrl.unsqueeze(1).unsqueeze(1)#[1,1024,1024,25,2]
-    D = torch.sqrt((diff ** 2).sum(-1))#[1,1024,1024,25]
-    delta=1e-2
+    T = ctrl.shape[1]
 
-    # lambda1= 0
-    # for i in range(25):
-    #     for j in range(25):
-    #         distance = torch.sqrt((ctrl[0][i][0] - ctrl[0][j][0])**2+(ctrl[0][i][1] - ctrl[0][j][1])**2)  # 计算欧氏距离
-    #         lambda1=lambda1+distance
-    # lambda1=lambda1/625
-    regular=torch.cos(torch.sqrt(D))*delta
-    U = (D ** 2) * torch.log(D + 1e-6)+regular#[1,1024,1024,25]
+    diff = grid[..., 1:].unsqueeze(-2) - ctrl.unsqueeze(1).unsqueeze(1)
+    D = torch.sqrt((diff ** 2).sum(-1))
+    U = (D ** 2) * torch.log(D + 1e-6)
 
-    w, a = theta[:, :-3, :], theta[:, -3:, :]#[1,24,2] [1,3,2]
+    w, a = theta[:, :-3, :], theta[:, -3:, :]
+
     reduced = T + 2 == theta.shape[1]
     if reduced:
-        w = torch.cat((-w.sum(dim=1, keepdim=True), w), dim=1)#[1,25,2]
+        w = torch.cat((-w.sum(dim=1, keepdim=True), w), dim=1)
 
         # U is NxHxWxT
-    b = torch.bmm(U.view(N, -1, T), w).view(N, H, W, 2)#[1,1024,1024,2]
+    b = torch.bmm(U.view(N, -1, T), w).view(N, H, W, 2)
     # b is NxHxWx2
-    z = torch.bmm(grid.view(N, -1, 3), a).view(N, H, W, 2) + b#[1,1024,1024,2]
+    z = torch.bmm(grid.view(N, -1, 3), a).view(N, H, W, 2) + b
 
     return z
 
