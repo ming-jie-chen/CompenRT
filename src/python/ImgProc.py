@@ -8,7 +8,7 @@ def thresh(im_in):
         im_in = cv.cvtColor(im_in, cv.COLOR_BGR2GRAY)
     if im_in.dtype == 'float32':
         im_in = np.uint8(im_in * 255)
-    _, im_mask = cv.threshold(cv.GaussianBlur(im_in, (5, 5), 0), 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)#用5*5的均值滤波对图像进行平滑处理，使得直方图得到很好的改善，
+    _, im_mask = cv.threshold(cv.GaussianBlur(im_in, (5, 5), 0), 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
     im_mask = im_mask > 0
 
     # find the largest contour by area then convert it to convex hull
