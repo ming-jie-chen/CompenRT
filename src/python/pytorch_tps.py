@@ -96,7 +96,7 @@ def tps_grid(theta, ctrl, size):
         locations for each output pixel.
     '''
     N, _, H, W = size
-    grid = theta.new(N, H, W, 3)#[1,1024,1024,3]
+    grid = theta.new(N, H, W, 3)
     grid[:, :, :, 0] = 1.
     grid[:, :, :, 1] = torch.linspace(0, 1, W)
     grid[:, :, :, 2] = torch.linspace(0, 1, H).unsqueeze(-1)
